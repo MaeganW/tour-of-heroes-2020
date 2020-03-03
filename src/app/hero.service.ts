@@ -12,6 +12,11 @@ import { catchError, map, tap } from 'rxjs/operators';
 export class HeroService {
   private heroesUrl = 'api/heroes';  // url to web api
   public hero: Hero;
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json'
+    })
+  };
 
   // getHeros(): Hero[]{ // old method when we were getting data synchronously
   //   return HEROES;
@@ -20,6 +25,13 @@ export class HeroService {
   constructor(
     private messageService: MessageService,
     private http: HttpClient) {
+  }
+
+  addHero(hero: Hero): Observable<Hero> {
+    return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
+      tap((newHero: Hero) => this.log(`Added hero w/ id=${newHero.id}`)),
+      catchError(this.handleError<Hero>('addHero'))
+    );
   }
 
   getHeroes(): Observable<Hero[]> {
@@ -50,6 +62,13 @@ export class HeroService {
 
   private log(message: string) {
     this.messageService.addMessage(`HeroService: ${message}`);
+  }
+
+  updateHero(hero: Hero): Observable<any> {
+    return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
+      tap(_ => this.log(`Updated hero id=${hero.id}`)),
+      catchError(this.handleError<any>('updateHero'))
+    );
   }
 
 }
