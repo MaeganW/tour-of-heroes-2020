@@ -1,0 +1,16 @@
+<div id="search-component">
+  <h4><label for="search-box">Hero Search</label></h4>
+
+  <!-- https://angular.io/guide/template-syntax#template-reference-variables-var -->
+  <input #searchBox (input)="search(searchBox.value)" type="text" id="search-box"/>
+
+  <ul class="search-result">
+    <!-- heroes$ - the dollar sign convention indicates this is an observable not an array -->
+    <!-- Since *ngFor can't do anything with an Observable, use the pipe character (|) followed by async. This identifies Angular's AsyncPipe and subscribes to an Observable automatically so you won't have to do so in the component class.-->
+    <li *ngFor="let hero of heroes$ | async">
+      <a routerLink="/detail/{{hero.id}}">
+        {{hero.name}}
+      </a>
+    </li>
+  </ul>
+</div>

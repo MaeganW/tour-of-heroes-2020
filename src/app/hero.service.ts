@@ -70,7 +70,7 @@ export class HeroService {
   }
 
   searchHeroes(term: string): Observable<Hero[]> {
-    if (!term.trim()){
+    if (!term.trim()) {
       // if no search term, return an empty array
       return of([]);
     }
@@ -81,6 +81,7 @@ export class HeroService {
       catchError(this.handleError<Hero[]>('Search heroes', []))
     );
   }
+
 
   updateHero(hero: Hero): Observable<any> {
     return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
