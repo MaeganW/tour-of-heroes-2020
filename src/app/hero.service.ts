@@ -5,7 +5,6 @@ import { MessageService } from './message.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -18,10 +17,6 @@ export class HeroService {
     })
   };
 
-  // getHeros(): Hero[]{ // old method when we were getting data synchronously
-  //   return HEROES;
-  // }
-
   constructor(
     private messageService: MessageService,
     private http: HttpClient) {
@@ -31,6 +26,16 @@ export class HeroService {
     return this.http.post<Hero>(this.heroesUrl, hero, this.httpOptions).pipe(
       tap((newHero: Hero) => this.log(`Added hero w/ id=${newHero.id}`)),
       catchError(this.handleError<Hero>('addHero'))
+    );
+  }
+
+  deleteHero(hero: Hero | number): Observable<Hero> {
+    const id = typeof hero === 'number' ? hero : hero.id;
+    const url = `${this.heroesUrl}/${id}`;
+
+    return this.http.delete<Hero>(url, this.httpOptions).pipe(
+      tap(_ => this.log(`Deleted hero id=${id}`)),
+      catchError(this.handleError<Hero>('deleteHero'))
     );
   }
 
@@ -62,6 +67,19 @@ export class HeroService {
 
   private log(message: string) {
     this.messageService.addMessage(`HeroService: ${message}`);
+  }
+
+  searchHeroes(term: string): Observable<Hero[]> {
+    if (!term.trim()){
+      // if no search term, return an empty array
+      return of([]);
+    }
+    return this.http.get<Hero[]>(`${this.heroesUrl}/?name=${term}`).pipe(
+      tap(x => x.length ?
+        this.log(`Found heroes matching "${term}"`) :
+        this.log(`No heroes matching "${term}"`)),
+      catchError(this.handleError<Hero[]>('Search heroes', []))
+    );
   }
 
   updateHero(hero: Hero): Observable<any> {
